@@ -63,7 +63,7 @@ And then deploy the demo:
 
 
   ```shell
-  oc new-app -n cicd-userX -f cicd-template.yaml --param DEV_PROJECT=dev-userX --param STAGE_PROJECT=stage-userX
+  oc new-app -n cicd-userX -f https://raw.githubusercontent.com/santiagoangel/openshift-cd-demo/ocp-3.10/cicd-template.yaml --param DEV_PROJECT=dev-userX --param STAGE_PROJECT=stage-userX
   ```
 
 
