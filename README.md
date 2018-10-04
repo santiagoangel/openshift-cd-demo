@@ -1,6 +1,6 @@
 *For other versions of OpenShift, follow the instructions in the corresponding branch e.g. ocp-3.10, ocp-3.9, etc
 
-# CI/CD Demo - OpenShift Container Platform 3.10
+# Multi user CI/CD Demo - OpenShift Container Platform 3.10
 
 This repository includes the infrastructure and pipeline definition for continuous delivery using Jenkins, Nexus, SonarQube and Eclipse Che on OpenShift. 
 
@@ -36,48 +36,34 @@ The application used in this pipeline is a JAX-RS application which is available
 * 10+ GB memory
 * JBoss EAP 7 imagestreams imported to OpenShift (see Troubleshooting section for details)
 
-## Deploy on RHPDS
 
-If you have access to RHPDS, provisioning of this demo is automated via the service catalog under **OpenShift Demos &rarr; OpenShift CI/CD for Monolith**. If you don't know what RHPDS is, read the instructions in the next section.
-
-## Automated Deploy on OpenShift
-You can se the `scripts/provision.sh` script provided to deploy the entire demo:
-
-  ```
-  ./provision.sh --help
-  ./provision.sh deploy --deploy-che --ephemeral
-  ./provision.sh delete 
   ```
   
-## Manual Deploy on OpenShift
-Follow these [instructions](docs/local-cluster.md) in order to create a local OpenShift cluster. Otherwise using your current OpenShift cluster, create the following projects for CI/CD components, Dev and Stage environments:
+## userX Deploy on OpenShift
+Using your current OpenShift cluster, create the following projects for CI/CD components, Dev and Stage environments:
 
   ```shell
   # Create Projects
-  oc new-project dev --display-name="Tasks - Dev"
-  oc new-project stage --display-name="Tasks - Stage"
-  oc new-project cicd --display-name="CI/CD"
+  oc new-project dev-userX --display-name="Tasks - Dev"
+  oc new-project stage-userX --display-name="Tasks - Stage"
+  oc new-project cicd-userX --display-name="CI/CD"
 
   # Grant Jenkins Access to Projects
-  oc policy add-role-to-user edit system:serviceaccount:cicd:jenkins -n dev
-  oc policy add-role-to-user edit system:serviceaccount:cicd:jenkins -n stage
+  oc policy add-role-to-user edit system:serviceaccount:cicd-userX:jenkins -n dev-userX
+  oc policy add-role-to-user edit system:serviceaccount:cicd-userX:jenkins -n stage-userX
   ```  
 
 And then deploy the demo:
 
   ```
   # Deploy Demo
-  oc new-app -n cicd -f cicd-template.yaml
-
-  # Deploy Demo woth Eclipse Che
-  oc new-app -n cicd -f cicd-template.yaml --param=WITH_CHE=true
+  
   ```
 
-To use custom project names, change `cicd`, `dev` and `stage` in the above commands to
-your own names and use the following to create the demo:
+
 
   ```shell
-  oc new-app -n cicd -f cicd-template.yaml --param DEV_PROJECT=dev-project-name --param STAGE_PROJECT=stage-project-name
+  oc new-app -n cicd-userX -f cicd-template.yaml --param DEV_PROJECT=dev-userX --param STAGE_PROJECT=stage-userX
   ```
 
 
@@ -134,20 +120,9 @@ your own names and use the following to create the demo:
 
 ## Using Eclipse Che for Editing Code
 
-If you deploy the demo template using `WITH_CHE=true` paramter, or the deploy script and use `--deploy-che` flag, then an [Eclipse Che](https://www.eclipse.org/che/) instances will be deployed within the CI/CD project which allows you to use the Eclipse Che web-based IDE for editing code in this demo.
+An [Eclipse Che](https://www.eclipse.org/che/) instances will be deployed within the CI/CD project which allows you to use the Eclipse Che web-based IDE for editing code in this demo.
 
-
-Here is a step-by-step guide for editing and pushing the code to the Gogs repository (step 6) using Eclipse Che.
-
-Click on Eclipse Che route url in the CI/CD project which takes you to the workspace administration page. Select the *Java* stack and click on the *Create* button to create a workspace for yourself.
-
-![](images/che-create-workspace.png?raw=true)
-
-Once the workspace is created, click on *Open* button to open your workspace in the Eclipse Che in the browser.
-
-![](images/che-open-workspace.png?raw=true)
-
-It might take a little while before your workspace is set up and ready to be used in your browser. Once it's ready, click on **Import Project...** in order to import the `openshift-tasks` Gogs repository into your workspace.
+In your workspace, click on **Import Project...** in order to import the `openshift-tasks` Gogs repository into your workspace.
 
 ![](images/che-import-project.png?raw=true)
 
